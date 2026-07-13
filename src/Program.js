@@ -43,6 +43,10 @@ class Program {
     document.querySelectorAll('[name="zoom"]').forEach(input => input.addEventListener('change', () => this.gameFrame.style.zoom = input.value / 100));
     document.querySelectorAll('[name="position"]').forEach(input => input.addEventListener('change', () => this.gameHero.dataset.position = input.value));
     this.nightMode.addEventListener('change', () => document.body.classList.toggle('night-mode-active', this.nightMode.checked));
+    this.gameFrame.addEventListener('mousedown', event => {
+      if (!event.target.closest('.cell, .face')) event.preventDefault();
+    });
+    this.gameFrame.addEventListener('contextmenu', event => event.preventDefault());
 
     this.boardElement.addEventListener('mousedown', event => {
       const button = event.target.closest('.cell');
