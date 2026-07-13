@@ -16,7 +16,6 @@ class Game {
     this.isGameStarted = false;
     this.isGameOver = false;
     this.safeCellsRemaining = minefieldHeight * minefieldWidth - mines;
-    this.tilesToReveal = [];
     this.minefieldHeight = minefieldHeight;
     this.minefieldWidth = minefieldWidth;
 
@@ -104,15 +103,6 @@ class Game {
 
   /** @returns {number} Number of safe tiles still hidden. */
   getNumberSafeCellsRemaining() { return this.safeCellsRemaining; }
-
-  /** @returns {Tile[]} Tiles revealed during current mouse action. */
-  getTilesToReveal() { return this.tilesToReveal; }
-
-  /**
-   * Replaces temporary reveal list after Program redraws board.
-   * @param {Tile[]} tilesToReveal New temporary reveal list.
-   */
-  setTilesToReveal(tilesToReveal) { this.tilesToReveal = tilesToReveal; }
 
   /** @returns {string} Three-digit Minesweeper-style flag counter. */
   getFlagsRemaining() {

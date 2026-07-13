@@ -44,7 +44,7 @@ class Program {
       if (event.buttons === 3) {
         event.preventDefault();
         tile.chord();
-        this.finishMove();
+        this.render();
       } else if (event.button === 0) {
         tile.pressPrimary();
         this.render();
@@ -53,7 +53,7 @@ class Program {
 
     this.boardElement.addEventListener('mouseup', event => {
       if (event.button === 0 && !this.game.getIsGameOver()) this.setFace('smiley');
-      this.finishMove();
+      this.render();
     });
 
     this.boardElement.addEventListener('contextmenu', event => {
@@ -62,7 +62,7 @@ class Program {
       if (!button) return;
 
       this.tileFor(button).pressSecondary();
-      this.finishMove();
+      this.render();
     });
 
     this.boardElement.addEventListener('dragstart', event => event.preventDefault());
@@ -73,12 +73,6 @@ class Program {
     this.timerStartedAt = 0;
     this.face = 'smiley';
     this.game = new Game(this, this.minefieldHeight, this.minefieldWidth, this.mines);
-    this.render();
-  }
-
-  /** Clears temporary Java-style reveal list and redraws final move state. */
-  finishMove() {
-    this.game.setTilesToReveal([]);
     this.render();
   }
 

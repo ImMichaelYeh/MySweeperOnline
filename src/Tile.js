@@ -26,7 +26,6 @@ class Tile {
   click() {
     if (this.gameInstance.getIsGameOver() || this.isRevealed || this.isFlagged) return;
 
-    this.gameInstance.getTilesToReveal().push(this);
     this.isRevealed = true;
 
     if (this.isMine) {
