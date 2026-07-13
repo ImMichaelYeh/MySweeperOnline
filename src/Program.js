@@ -50,6 +50,7 @@ class Program {
         this.pressedCell = null;
         event.preventDefault();
         tile.chord();
+        if (!this.game.getIsGameOver()) this.setFace('smiley');
         this.render();
       } else if (event.button === 2 || event.ctrlKey && event.button === 0) {
         event.preventDefault();
