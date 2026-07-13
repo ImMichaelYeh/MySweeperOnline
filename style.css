@@ -403,7 +403,7 @@ h1 {
 .slider-setting input::-webkit-slider-runnable-track {
   height: .45rem;
   border-radius: .25rem;
-  background: repeating-linear-gradient(90deg, #778b9c 0 2px, #c0c0c0 2px calc(100% / 6));
+  background: repeating-linear-gradient(90deg, #778b9c 0 2px, #c0c0c0 2px 10%);
 }
 
 .slider-setting input::-webkit-slider-thumb {
@@ -419,7 +419,7 @@ h1 {
 .slider-setting input::-moz-range-track {
   height: .45rem;
   border-radius: .25rem;
-  background: repeating-linear-gradient(90deg, #778b9c 0 2px, #c0c0c0 2px calc(100% / 6));
+  background: repeating-linear-gradient(90deg, #778b9c 0 2px, #c0c0c0 2px 10%);
 }
 
 .slider-setting input::-moz-range-thumb {

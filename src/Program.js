@@ -184,7 +184,7 @@ class Program {
         if (Number.isFinite(Number(value))) input.value = value;
       });
       const zoom = Number(settings.zoom);
-      if (Number.isInteger(zoom) && zoom >= 70 && zoom <= 130 && zoom % 10 === 0) this.zoom.value = zoom;
+      if (Number.isInteger(zoom) && zoom >= 50 && zoom <= 150 && zoom % 10 === 0) this.zoom.value = zoom;
       if (['left', 'center', 'right'].includes(settings.position)) document.querySelector(`[name="position"][value="${settings.position}"]`).checked = true;
     } catch { /* No valid saved settings. */ }
   }
