@@ -128,20 +128,26 @@ class Program {
     this.render();
   }
 
-  /** Renders counters, face, and all playable tiles from current Game state. */
+  /** Renders counters, face, and only tiles whose visual state changed. */
   render() {
     this.flagsCounter.textContent = this.game.getFlagsRemaining();
     this.timerCounter.textContent = this.timerText();
     this.faceImage.src = `src/res/${this.face}.png`;
     this.boardElement.style.gridTemplateColumns = `repeat(${this.minefieldWidth}, ${this.cellSize}px)`;
 
-    const buttons = [];
+    const tiles = [];
     for (let row = 1; row <= this.minefieldHeight; row++) {
       for (let column = 1; column <= this.minefieldWidth; column++) {
-        buttons.push(this.createTileButton(this.game.getBoard()[row][column]));
+        tiles.push(this.game.getBoard()[row][column]);
       }
     }
-    this.boardElement.replaceChildren(...buttons);
+
+    if (this.boardElement.childElementCount !== tiles.length) {
+      this.boardElement.replaceChildren(...tiles.map(tile => this.createTileButton(tile)));
+      return;
+    }
+
+    tiles.forEach((tile, index) => this.updateTileButton(this.boardElement.children[index], tile));
   }
 
   /**
@@ -151,22 +157,31 @@ class Program {
    */
   createTileButton(tile) {
     const button = document.createElement('button');
-    const state = this.stateFor(tile);
-
-    button.className = `cell ${state}`;
     button.dataset.row = tile.row;
     button.dataset.column = tile.column;
     button.setAttribute('aria-label', `Row ${tile.row}, column ${tile.column}`);
+    this.updateTileButton(button, tile);
+    return button;
+  }
 
+  /** Updates one existing tile button when its rendered state changes. */
+  updateTileButton(button, tile) {
+    const state = this.stateFor(tile);
     const imageName = this.imageFor(state, tile);
+    const renderKey = `${state}:${imageName || ''}`;
+    if (button.dataset.renderKey === renderKey) return;
+
+    button.className = `cell ${state}`;
+    button.dataset.renderKey = renderKey;
     if (imageName) {
-      const image = document.createElement('img');
+      const image = button.querySelector('img') || document.createElement('img');
       image.src = `src/res/${imageName}.png`;
       image.alt = '';
       image.draggable = false;
-      button.append(image);
+      if (!image.parentElement) button.append(image);
+    } else {
+      button.replaceChildren();
     }
-    return button;
   }
 
   /**
