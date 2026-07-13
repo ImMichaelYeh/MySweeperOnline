@@ -8,22 +8,33 @@
     <link rel="stylesheet" href="style.css">
   </head>
   <body>
-    <main>
-      <section class="game-frame" aria-label="MySweeper">
-        <header class="controls">
-          <output id="flags" class="counter" aria-label="Flags remaining">000</output>
-          <button class="face" type="button" aria-label="New game"><img src="src/res/smiley.png" alt="" draggable="false"></button>
-          <output id="timer" class="counter" aria-label="Elapsed time">000</output>
-        </header>
-        <section class="board" aria-label="Minesweeper board"></section>
+    <header class="site-header">
+      <nav class="site-nav" aria-label="Portfolio navigation">
+        <a class="site-brand" href="https://immichaelyeh.github.io/">Michael Yeh</a>
+      </nav>
+    </header>
+    <main class="site-content">
+      <section class="game-hero">
+        <section class="game-frame" aria-label="MySweeper">
+          <header class="controls">
+            <output id="flags" class="counter" aria-label="Flags remaining">000</output>
+            <button class="face" type="button" aria-label="New game"><img src="src/res/smiley.png" alt="" draggable="false"></button>
+            <output id="timer" class="counter" aria-label="Elapsed time">000</output>
+          </header>
+          <section class="board" aria-label="Minesweeper board"></section>
+        </section>
+        <label class="difficulty">Difficulty
+          <select id="difficulty"><option>Beginner</option><option>Intermediate</option><option selected>Expert</option></select>
+        </label>
+        <p class="instructions">Left-click: reveal · Right-click: flag · Both buttons on number: chord</p>
       </section>
-      <label class="difficulty">Difficulty
-        <select id="difficulty"><option>Beginner</option><option>Intermediate</option><option selected>Expert</option></select>
-      </label>
-      <p>Left-click: reveal · Right-click: flag · Both buttons on number: chord</p>
     </main>
+    <footer>
+      <p>Michael Yeh © <span id="footerYear"></span></p>
+    </footer>
     <script src="src/Tile.js"></script>
     <script src="src/Game.js"></script>
     <script src="src/Program.js"></script>
+    <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
   </body>
 </html>
