@@ -23,7 +23,7 @@ class Tile {
   }
 
   /** Reveals tile, recursively reveals empty neighbors, and checks game end. */
-  click() {
+  click(deferWin = false) {
     if (this.gameInstance.getIsGameOver() || this.isRevealed || this.isFlagged) return;
 
     this.isRevealed = true;
@@ -38,12 +38,12 @@ class Tile {
     if (this.numberMinesSurrounding === 0) {
       for (const tile of this.getSurroundingTiles()) {
         if (tile && tile !== this && !tile.isFlagged && !tile.isRevealed) {
-          tile.click();
+          tile.click(deferWin);
         }
       }
     }
 
-    if (this.gameInstance.getNumberSafeCellsRemaining() <= 0) {
+    if (!deferWin && this.gameInstance.getNumberSafeCellsRemaining() <= 0) {
       this.gameInstance.gameOver(true);
     }
   }
@@ -82,8 +82,15 @@ class Tile {
     const flags = surroundingTiles.filter(tile => tile && tile.isFlagged).length;
     if (flags !== this.numberMinesSurrounding) return;
 
-    for (const tile of surroundingTiles) {
-      if (tile && !tile.isFlagged && !tile.isRevealed) tile.click();
+    const hiddenNeighbors = surroundingTiles.filter(tile => tile && !tile.isFlagged && !tile.isRevealed);
+    const safeNeighbors = hiddenNeighbors.filter(tile => !tile.isMine);
+    const exposedMine = hiddenNeighbors.find(tile => tile.isMine);
+    for (const tile of safeNeighbors) tile.click(true);
+
+    if (exposedMine) {
+      exposedMine.click();
+    } else if (this.gameInstance.getNumberSafeCellsRemaining() <= 0) {
+      this.gameInstance.gameOver(true);
     }
   }
 
