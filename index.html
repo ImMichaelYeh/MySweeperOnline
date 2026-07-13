@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="MySweeper, a browser-only Minesweeper game.">
+    <title>MySweeper</title>
+    <link rel="stylesheet" href="style.css">
+  </head>
+  <body>
+    <main>
+      <section class="game-frame" aria-label="MySweeper">
+        <header class="controls">
+          <output id="flags" class="counter" aria-label="Flags remaining">000</output>
+          <button class="face" type="button" aria-label="New game"><img src="src/res/smiley.png" alt="" draggable="false"></button>
+          <output id="timer" class="counter" aria-label="Elapsed time">000</output>
+        </header>
+        <section class="board" aria-label="Minesweeper board"></section>
+      </section>
+      <label class="difficulty">Difficulty
+        <select id="difficulty"><option>Beginner</option><option>Intermediate</option><option selected>Expert</option></select>
+      </label>
+      <p>Left-click: reveal · Right-click: flag · Both buttons on number: chord</p>
+    </main>
+    <script src="src/Tile.js"></script>
+    <script src="src/Game.js"></script>
+    <script src="src/Program.js"></script>
+  </body>
+</html>
