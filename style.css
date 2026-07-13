@@ -107,6 +107,7 @@ h1 {
 .cell.revealed, .cell.mine, .cell.exploded { background: url('src/res/borderedbackground.png') center / 100% 100%; }
 .cell img { display: block; width: 75%; height: 75%; margin: auto; object-fit: contain; image-rendering: pixelated; }
 .cell.revealed img { width: 70%; height: 70%; }
+.cell.exploded { background: #f00; }
 .board, .cell, .cell img, .face img { user-select: none; -webkit-user-drag: none; }
 
 .game-panels {
