@@ -1,123 +1,154 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="It's MySweeper, my Minesweeper clone.">
-    <meta property="og:type" content="website">
-    <meta property="og:title" content="MySweeper">
-    <meta property="og:description" content="MySweeper, a browser-only Minesweeper game.">
-    <meta property="og:image" content="https://immichaelyeh.github.io/MySweeperOnline/preview.png">
-    <meta name="twitter:card" content="summary_large_image">
-    <title>MySweeper</title>
-    <link rel="icon" type="image/png" href="src/res/mine.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preload" as="image" href="src/res/tile.png" fetchpriority="high">
-    <link rel="preload" as="image" href="src/res/borderedbackground.png">
-    <link rel="preload" as="image" href="src/res/zero.png">
-    <link rel="preload" as="image" href="src/res/one.png">
-    <link rel="preload" as="image" href="src/res/two.png">
-    <link rel="preload" as="image" href="src/res/three.png">
-    <link rel="preload" as="image" href="src/res/four.png">
-    <link rel="preload" as="image" href="src/res/five.png">
-    <link rel="preload" as="image" href="src/res/six.png">
-    <link rel="preload" as="image" href="src/res/seven.png">
-    <link rel="preload" as="image" href="src/res/eight.png">
-    <link rel="preload" as="image" href="src/res/flag.png">
-    <link rel="preload" as="image" href="src/res/mine.png">
-    <link rel="preload" as="image" href="src/res/mineclicked.png">
-    <link rel="preload" as="image" href="src/res/badflag.png">
-    <link rel="preload" as="image" href="src/res/smiley.png">
-    <link rel="preload" as="image" href="src/res/shocked.png">
-    <link rel="preload" as="image" href="src/res/dead.png">
-    <link rel="preload" as="image" href="src/res/sunglasses.png">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://immichaelyeh.github.io/css/site-nav.css">
-  </head>
-  <body>
-    <header class="site-header">
-      <nav class="site-nav" aria-label="Portfolio navigation">
-        <a class="site-brand" href="https://immichaelyeh.github.io/">Michael Yeh</a>
-      </nav>
-    </header>
-    <main class="site-content">
-      <section class="game-hero" data-position="center">
-        <header class="game-title"><h1>MySweeper</h1></header>
-        <section class="game-frame" aria-label="MySweeper">
-          <header class="controls">
-            <output id="flags" class="counter" aria-label="Flags remaining">000</output>
-            <button class="face" type="button" aria-label="New game"><img src="src/res/smiley.png" alt="" draggable="false"></button>
-            <output id="timer" class="counter" aria-label="Elapsed time">000</output>
-          </header>
-          <section class="board" aria-label="Minesweeper board"></section>
-        </section>
-        <section id="leaderboard-panel" class="leaderboard-panel" aria-label="Leaderboard">
-          <h2>Best Times</h2>
-          <div class="leaderboard" aria-live="polite">
-            <section class="leaderboard-column"><h3>Expert</h3><ol id="leaderboard-expert"></ol></section>
-            <section class="leaderboard-column"><h3>Intermediate</h3><ol id="leaderboard-intermediate"></ol></section>
-            <section class="leaderboard-column"><h3>Beginner</h3><ol id="leaderboard-beginner"></ol></section>
-          </div>
-        </section>
-        <section class="game-panels" aria-label="Game settings">
-          <details class="control-panel">
-            <summary>Game Settings</summary>
-            <div class="panel-content">
-              <div class="game-settings">
-                <div class="game-setting-heading"><span></span><span>Height</span><span>Width</span><span>Mines</span></div>
-                <label class="game-setting"><span><input type="radio" name="game-mode" value="Beginner"> Beginner</span><span>9</span><span>9</span><span>10</span></label>
-                <label class="game-setting"><span><input type="radio" name="game-mode" value="Intermediate"> Intermediate</span><span>16</span><span>16</span><span>40</span></label>
-                <label class="game-setting"><span><input type="radio" name="game-mode" value="Expert" checked> Expert</span><span>16</span><span>30</span><span>99</span></label>
-                <label class="game-setting"><span><input type="radio" name="game-mode" value="Custom"> Custom</span><input id="custom-height" type="number" min="4" max="99" value="20" aria-label="Custom height"><input id="custom-width" type="number" min="4" max="99" value="30" aria-label="Custom width"><input id="custom-mines" type="number" min="1" value="145" aria-label="Custom mines"></label>
-              </div>
-              <button id="new-game" type="button">New Game</button>
-            </div>
-          </details>
 
-          <details class="control-panel">
-            <summary>Display</summary>
-            <div class="panel-content">
-              <fieldset class="display-setting">
-                <legend>Zoom</legend>
-                <label><input type="radio" name="zoom" value="50"> 50%</label>
-                <label><input type="radio" name="zoom" value="75"> 75%</label>
-                <label><input type="radio" name="zoom" value="100" checked> 100%</label>
-                <label><input type="radio" name="zoom" value="125"> 125%</label>
-                <label><input type="radio" name="zoom" value="150"> 150%</label>
-              </fieldset>
-              <fieldset class="display-setting">
-                <legend>Position</legend>
-                <label><input type="radio" name="position" value="center" checked> Center</label>
-                <label><input type="radio" name="position" value="left"> Left</label>
-              </fieldset>
-              <label class="night-mode"><input id="night-mode" type="checkbox"> Night Mode</label>
-            </div>
-          </details>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="It's MySweeper, my Minesweeper clone.">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="MySweeper">
+  <meta property="og:description" content="MySweeper, a browser-only Minesweeper game.">
+  <meta property="og:image" content="https://immichaelyeh.github.io/MySweeperOnline/preview.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <title>MySweeper</title>
+  <link rel="icon" type="image/png" href="src/res/mine.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="preload" as="image" href="src/res/tile.png" fetchpriority="high">
+  <link rel="preload" as="image" href="src/res/borderedbackground.png">
+  <link rel="preload" as="image" href="src/res/zero.png">
+  <link rel="preload" as="image" href="src/res/one.png">
+  <link rel="preload" as="image" href="src/res/two.png">
+  <link rel="preload" as="image" href="src/res/three.png">
+  <link rel="preload" as="image" href="src/res/four.png">
+  <link rel="preload" as="image" href="src/res/five.png">
+  <link rel="preload" as="image" href="src/res/six.png">
+  <link rel="preload" as="image" href="src/res/seven.png">
+  <link rel="preload" as="image" href="src/res/eight.png">
+  <link rel="preload" as="image" href="src/res/flag.png">
+  <link rel="preload" as="image" href="src/res/mine.png">
+  <link rel="preload" as="image" href="src/res/mineclicked.png">
+  <link rel="preload" as="image" href="src/res/badflag.png">
+  <link rel="preload" as="image" href="src/res/smiley.png">
+  <link rel="preload" as="image" href="src/res/shocked.png">
+  <link rel="preload" as="image" href="src/res/dead.png">
+  <link rel="preload" as="image" href="src/res/sunglasses.png">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://immichaelyeh.github.io/css/site-nav.css">
+</head>
 
-          <details class="control-panel controls-panel">
-            <summary>Controls</summary>
-            <div class="panel-content">
-              <ul>
-                <li>Left-click a tile to reveal it.</li>
-                <li>Right-click a tile to flag it.</li>
-                <li>Left + right click a number to reveal adjacent squares (chording).</li>
-                <li>Space bar on a tile to flag it or reveal its adjacent squares.</li>
-                <li>Press ESC or click the smiley face to start a new game.</li>
-              </ul>
-            </div>
-          </details>
-
-        </section>
+<body>
+  <header class="site-header">
+    <nav class="site-nav" aria-label="Portfolio navigation">
+      <a class="site-brand" href="https://immichaelyeh.github.io/">Michael Yeh</a>
+    </nav>
+  </header>
+  <main class="site-content">
+    <section class="game-hero" data-position="center">
+      <header class="game-title">
+        <h1>MySweeper</h1>
+      </header>
+      <section class="game-frame" aria-label="MySweeper">
+        <header class="controls">
+          <output id="flags" class="counter" aria-label="Flags remaining">000</output>
+          <button class="face" type="button" aria-label="New game"><img src="src/res/smiley.png" alt=""
+              draggable="false"></button>
+          <output id="timer" class="counter" aria-label="Elapsed time">000</output>
+        </header>
+        <section class="board" aria-label="Minesweeper board"></section>
       </section>
-    </main>
-    <footer>
-      <p>Michael Yeh © <span id="footerYear"></span></p>
-    </footer>
-    <script src="src/Tile.js"></script>
-    <script src="src/Game.js"></script>
-    <script src="src/Program.js"></script>
-    <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
-  </body>
+      <section id="leaderboard-panel" class="leaderboard-panel" aria-label="Leaderboard">
+        <h2>Best Times</h2>
+        <div class="leaderboard" aria-live="polite">
+          <section class="leaderboard-column">
+            <h3>Expert</h3>
+            <ol id="leaderboard-expert"></ol>
+          </section>
+          <section class="leaderboard-column">
+            <h3>Intermediate</h3>
+            <ol id="leaderboard-intermediate"></ol>
+          </section>
+          <section class="leaderboard-column">
+            <h3>Beginner</h3>
+            <ol id="leaderboard-beginner"></ol>
+          </section>
+        </div>
+      </section>
+      <section class="game-panels" aria-label="Game settings">
+        <details class="control-panel">
+          <summary>Game Settings</summary>
+          <div class="panel-content">
+            <div class="game-settings">
+              <div class="game-setting-heading"><span></span><span>Height</span><span>Width</span><span>Mines</span>
+              </div>
+              <label class="game-setting"><span><input type="radio" name="game-mode" value="Beginner">
+                  Beginner</span><span>9</span><span>9</span><span>10</span></label>
+              <label class="game-setting"><span><input type="radio" name="game-mode" value="Intermediate">
+                  Intermediate</span><span>16</span><span>16</span><span>40</span></label>
+              <label class="game-setting"><span><input type="radio" name="game-mode" value="Expert" checked>
+                  Expert</span><span>16</span><span>30</span><span>99</span></label>
+              <label class="game-setting"><span><input type="radio" name="game-mode" value="Custom"> Custom</span><input
+                  id="custom-height" type="number" min="4" max="99" value="20" aria-label="Custom height"><input
+                  id="custom-width" type="number" min="4" max="99" value="30" aria-label="Custom width"><input
+                  id="custom-mines" type="number" min="1" value="145" aria-label="Custom mines"></label>
+            </div>
+            <button id="new-game" type="button">New Game</button>
+          </div>
+        </details>
+
+        <details class="control-panel">
+          <summary>Display</summary>
+          <div class="panel-content">
+            <fieldset class="display-setting">
+              <legend>Zoom</legend>
+              <label class="slider-setting"><input id="zoom" type="range" min="70" max="130" step="10" value="100"
+                  list="zoom-stops" aria-describedby="zoom-value"><output id="zoom-value">100%</output></label>
+              <datalist id="zoom-stops">
+                <option value="70">
+                <option value="80">
+                <option value="90">
+                <option value="100">
+                <option value="110">
+                <option value="120">
+                <option value="130">
+              </datalist>
+            </fieldset>
+            <fieldset class="display-setting">
+              <legend>Position</legend>
+              <div class="position-setting">
+                <label><input type="radio" name="position" value="left"> Left</label>
+                <label><input type="radio" name="position" value="center" checked> Center</label>
+                <label><input type="radio" name="position" value="right"> Right</label>
+              </div>
+            </fieldset>
+            <label class="night-mode"><input id="night-mode" type="checkbox"> Night Mode</label>
+          </div>
+        </details>
+
+        <details class="control-panel controls-panel">
+          <summary>Controls</summary>
+          <div class="panel-content">
+            <ul>
+              <li>Left-click a tile to reveal it.</li>
+              <li>Right-click a tile to flag it.</li>
+              <li>Left + right click a number to reveal adjacent squares (chording).</li>
+              <li>Space bar on a tile to flag it or reveal its adjacent squares.</li>
+              <li>Press ESC or click the smiley face to start a new game.</li>
+            </ul>
+          </div>
+        </details>
+
+      </section>
+    </section>
+  </main>
+  <footer>
+    <p>Michael Yeh © <span id="footerYear"></span></p>
+  </footer>
+  <script src="src/Tile.js"></script>
+  <script src="src/Game.js"></script>
+  <script src="src/Program.js"></script>
+  <script>document.getElementById('footerYear').textContent = new Date().getFullYear();</script>
+</body>
+
 </html>

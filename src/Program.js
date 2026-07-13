@@ -24,11 +24,16 @@ class Program {
     this.customHeight = document.querySelector('#custom-height');
     this.customWidth = document.querySelector('#custom-width');
     this.customMines = document.querySelector('#custom-mines');
+    this.zoom = document.querySelector('#zoom');
     this.nightMode = document.querySelector('#night-mode');
     this.leaderboardElements = Object.fromEntries(Program.leaderboardDifficulties.map(difficulty => [difficulty, document.querySelector(`#leaderboard-${difficulty.toLowerCase()}`)]));
     this.leaderboard = this.loadLeaderboard();
     this.currentDifficulty = 'Expert';
 
+    this.restoreSettings();
+    this.applySelectedSettings();
+    this.updateZoom();
+    this.updatePosition();
     this.installListeners();
     this.newGame();
     this.renderLeaderboard();
@@ -39,9 +44,22 @@ class Program {
   installListeners() {
     this.faceButton.addEventListener('click', () => this.newGame());
     this.newGameButton.addEventListener('click', () => this.startSelectedGame());
-    [this.customHeight, this.customWidth, this.customMines].forEach(input => input.addEventListener('input', () => document.querySelector('[value="Custom"]').checked = true));
-    document.querySelectorAll('[name="zoom"]').forEach(input => input.addEventListener('change', () => this.gameFrame.style.zoom = input.value / 100));
-    document.querySelectorAll('[name="position"]').forEach(input => input.addEventListener('change', () => this.gameHero.dataset.position = input.value));
+    document.querySelectorAll('[name="game-mode"]').forEach(input => input.addEventListener('change', () => this.saveSettings()));
+    [this.customHeight, this.customWidth, this.customMines].forEach(input => input.addEventListener('input', () => {
+      document.querySelector('[value="Custom"]').checked = true;
+      this.saveSettings();
+    }));
+    this.zoom.addEventListener('input', () => {
+      this.updateZoom();
+      this.saveSettings();
+    });
+    document.querySelectorAll('[name="position"]').forEach(input => input.addEventListener('change', () => {
+      this.updatePosition();
+      this.saveSettings();
+    }));
+    document.addEventListener('click', event => {
+      if (!event.target.closest('.control-panel')) document.querySelectorAll('.control-panel[open]').forEach(panel => panel.removeAttribute('open'));
+    });
     this.nightMode.addEventListener('change', () => document.body.classList.toggle('night-mode-active', this.nightMode.checked));
     this.gameFrame.addEventListener('mousedown', event => {
       if (!event.target.closest('.cell, .face')) event.preventDefault();
@@ -102,6 +120,13 @@ class Program {
 
   /** Applies selected preset or validated custom dimensions, then starts a game. */
   startSelectedGame() {
+    this.applySelectedSettings();
+    this.saveSettings();
+    this.newGame();
+  }
+
+  /** Applies selected preset or validated custom dimensions. */
+  applySelectedSettings() {
     const selected = document.querySelector('[name="game-mode"]:checked').value;
     const level = Program.levels[selected];
 
@@ -121,7 +146,47 @@ class Program {
       this.customMines.max = maxMines;
       this.currentDifficulty = 'Custom';
     }
-    this.newGame();
+  }
+
+  /** Applies zoom control and its displayed value. */
+  updateZoom() {
+    this.gameFrame.style.zoom = this.zoom.value / 100 * .9;
+    document.querySelector('#zoom-value').textContent = `${this.zoom.value}%`;
+  }
+
+  /** Applies selected horizontal position. */
+  updatePosition() {
+    this.gameHero.dataset.position = document.querySelector('[name="position"]:checked').value;
+  }
+
+  /** Saves current game and display settings in this browser. */
+  saveSettings() {
+    const gameMode = document.querySelector('[name="game-mode"]:checked').value;
+    const settings = {
+      gameMode,
+      customHeight: this.customHeight.value,
+      customWidth: this.customWidth.value,
+      customMines: this.customMines.value,
+      zoom: this.zoom.value,
+      position: document.querySelector('[name="position"]:checked').value,
+    };
+    try { localStorage.setItem(Program.settingsKey, JSON.stringify(settings)); } catch { /* Storage unavailable. */ }
+  }
+
+  /** Restores valid saved game and display settings. */
+  restoreSettings() {
+    try {
+      const settings = JSON.parse(localStorage.getItem(Program.settingsKey));
+      if (!settings || typeof settings !== 'object') return;
+      if (Program.levels[settings.gameMode] || settings.gameMode === 'Custom') document.querySelector(`[value="${settings.gameMode}"]`).checked = true;
+      [this.customHeight, this.customWidth, this.customMines].forEach((input, index) => {
+        const value = [settings.customHeight, settings.customWidth, settings.customMines][index];
+        if (Number.isFinite(Number(value))) input.value = value;
+      });
+      const zoom = Number(settings.zoom);
+      if (Number.isInteger(zoom) && zoom >= 70 && zoom <= 130 && zoom % 10 === 0) this.zoom.value = zoom;
+      if (['left', 'center', 'right'].includes(settings.position)) document.querySelector(`[name="position"][value="${settings.position}"]`).checked = true;
+    } catch { /* No valid saved settings. */ }
   }
 
   /** Resets timer, face, board, and counters using selected difficulty. */
@@ -293,6 +358,7 @@ class Program {
   static difficulties = ['Beginner', 'Intermediate', 'Expert', 'Custom'];
   static leaderboardDifficulties = ['Expert', 'Intermediate', 'Beginner'];
   static leaderboardKey = 'mysweeper-leaderboard';
+  static settingsKey = 'mysweeper-settings';
   static numberImages = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
 }
 
