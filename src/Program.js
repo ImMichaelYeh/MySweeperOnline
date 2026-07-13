@@ -25,9 +25,13 @@ class Program {
     this.customWidth = document.querySelector('#custom-width');
     this.customMines = document.querySelector('#custom-mines');
     this.nightMode = document.querySelector('#night-mode');
+    this.leaderboardElements = Object.fromEntries(Program.leaderboardDifficulties.map(difficulty => [difficulty, document.querySelector(`#leaderboard-${difficulty.toLowerCase()}`)]));
+    this.leaderboard = this.loadLeaderboard();
+    this.currentDifficulty = 'Expert';
 
     this.installListeners();
     this.newGame();
+    this.renderLeaderboard();
     window.setInterval(() => this.updateTimer(), 1000);
   }
 
@@ -35,7 +39,6 @@ class Program {
   installListeners() {
     this.faceButton.addEventListener('click', () => this.newGame());
     this.newGameButton.addEventListener('click', () => this.startSelectedGame());
-    document.querySelectorAll('[name="game-mode"]').forEach(input => input.addEventListener('change', () => this.selectGameMode(input.value)));
     [this.customHeight, this.customWidth, this.customMines].forEach(input => input.addEventListener('input', () => document.querySelector('[value="Custom"]').checked = true));
     document.querySelectorAll('[name="zoom"]').forEach(input => input.addEventListener('change', () => this.gameFrame.style.zoom = input.value / 100));
     document.querySelectorAll('[name="position"]').forEach(input => input.addEventListener('change', () => this.gameHero.dataset.position = input.value));
@@ -102,6 +105,7 @@ class Program {
       this.minefieldWidth = level.width;
       this.minefieldHeight = level.height;
       this.mines = level.mines;
+      this.currentDifficulty = selected;
     } else {
       this.minefieldHeight = Math.min(99, Math.max(4, Math.floor(Number(this.customHeight.value)) || 4));
       this.minefieldWidth = Math.min(99, Math.max(4, Math.floor(Number(this.customWidth.value)) || 4));
@@ -111,17 +115,8 @@ class Program {
       this.customWidth.value = this.minefieldWidth;
       this.customMines.value = this.mines;
       this.customMines.max = maxMines;
+      this.currentDifficulty = 'Custom';
     }
-    this.newGame();
-  }
-
-  /** Starts selected preset immediately; custom dimensions wait for New Game. */
-  selectGameMode(mode) {
-    if (mode === 'Custom') return;
-    const level = Program.levels[mode];
-    this.minefieldHeight = level.height;
-    this.minefieldWidth = level.width;
-    this.mines = level.mines;
     this.newGame();
   }
 
@@ -213,6 +208,51 @@ class Program {
   /** Starts elapsed-time measurement after first reveal. */
   startTimer() { this.timerStartedAt = Date.now(); }
 
+  /** Saves a winning result and retains only ten fastest local times. */
+  recordWin() {
+    this.leaderboard.push({
+      time: Number(this.timerText()),
+      difficulty: this.currentDifficulty,
+      timestamp: new Date().toISOString(),
+    });
+    this.leaderboard = Program.difficulties.flatMap(difficulty => this.leaderboard
+      .filter(entry => entry.difficulty === difficulty)
+      .sort((first, second) => first.time - second.time || first.timestamp.localeCompare(second.timestamp))
+      .slice(0, 10));
+    try { localStorage.setItem(Program.leaderboardKey, JSON.stringify(this.leaderboard)); } catch { /* Storage unavailable. */ }
+    this.renderLeaderboard();
+  }
+
+  /** Loads valid leaderboard entries saved in this browser. */
+  loadLeaderboard() {
+    try {
+      const entries = JSON.parse(localStorage.getItem(Program.leaderboardKey));
+      if (!Array.isArray(entries)) return [];
+      return Program.difficulties.flatMap(difficulty => entries
+        .filter(entry => Number.isInteger(entry.time) && entry.time >= 0 && entry.difficulty === difficulty && typeof entry.timestamp === 'string')
+        .sort((first, second) => first.time - second.time || first.timestamp.localeCompare(second.timestamp))
+        .slice(0, 10));
+    } catch { return []; }
+  }
+
+  /** Renders saved local results with their board details and timestamp. */
+  renderLeaderboard() {
+    Program.leaderboardDifficulties.forEach(difficulty => {
+      const entries = this.leaderboard.filter(entry => entry.difficulty === difficulty);
+      this.leaderboardElements[difficulty].replaceChildren(...(entries.length ? entries : [{ time: null }]).map(entry => {
+        const item = document.createElement('li');
+        item.textContent = entry.time === null ? 'No wins yet.' : `${entry.time}s`;
+        if (entry.timestamp) {
+          const timestamp = document.createElement('time');
+          timestamp.dateTime = entry.timestamp;
+          timestamp.textContent = new Date(entry.timestamp).toLocaleString();
+          item.append(timestamp);
+        }
+        return item;
+      }));
+    });
+  }
+
   /** Updates timer display while an active game is running. */
   updateTimer() { if (this.game?.getIsGameStarted() && !this.game.getIsGameOver()) this.timerCounter.textContent = this.timerText(); }
 
@@ -231,6 +271,9 @@ class Program {
     Expert: { width: 30, height: 16, mines: 99 },
   };
 
+  static difficulties = ['Beginner', 'Intermediate', 'Expert', 'Custom'];
+  static leaderboardDifficulties = ['Expert', 'Intermediate', 'Beginner'];
+  static leaderboardKey = 'mysweeper-leaderboard';
   static numberImages = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
 }
 

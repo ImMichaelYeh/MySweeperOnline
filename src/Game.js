@@ -76,8 +76,10 @@ class Game {
    * @param {boolean} win True when all safe tiles were revealed.
    */
   gameOver(win) {
+    if (this.isGameOver) return;
     this.isGameOver = true;
     this.programInstance.setFace(win ? 'sunglasses' : 'dead');
+    if (win) this.programInstance.recordWin();
   }
 
   /** Increments remaining flag counter after a flag is removed. */

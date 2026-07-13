@@ -24,6 +24,14 @@
           </header>
           <section class="board" aria-label="Minesweeper board"></section>
         </section>
+        <section id="leaderboard-panel" class="leaderboard-panel" aria-label="Leaderboard">
+          <h2>Best Times</h2>
+          <div class="leaderboard" aria-live="polite">
+            <section class="leaderboard-column"><h3>Expert</h3><ol id="leaderboard-expert"></ol></section>
+            <section class="leaderboard-column"><h3>Intermediate</h3><ol id="leaderboard-intermediate"></ol></section>
+            <section class="leaderboard-column"><h3>Beginner</h3><ol id="leaderboard-beginner"></ol></section>
+          </div>
+        </section>
         <section class="game-panels" aria-label="Game settings">
           <details class="control-panel">
             <summary>Game Settings</summary>
@@ -71,6 +79,7 @@
               </ul>
             </div>
           </details>
+
         </section>
       </section>
     </main>
