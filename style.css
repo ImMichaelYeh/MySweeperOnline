@@ -89,10 +89,8 @@ h1 {
   max-width: 100%;
   padding: 1rem;
   overflow: auto;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: var(--surface);
-  box-shadow: var(--shadow);
+  border: 4px outset #eee;
+  background: #c0c0c0;
 }
 
 .controls {
@@ -106,12 +104,15 @@ h1 {
   background: #c0c0c0;
 }
 .counter {
+  display: flex;
+  align-items: center;
+  height: 3.55rem;
   padding: .35rem;
   border: 2px inset #777;
   background: #080808;
   color: #f10;
-  font: 700 2.5rem/1 monospace;
-  letter-spacing: .08rem;
+  font: 2.25rem/1 "Press Start 2P", monospace;
+  letter-spacing: .04rem;
 }
 .face { width: 3.55rem; height: 3.55rem; padding: .15rem; border: 3px outset #eee; background: #c0c0c0; cursor: pointer; }
 .face:active { border-style: inset; }
