@@ -18,54 +18,110 @@ class Program {
     this.faceImage = this.faceButton.querySelector('img');
     this.flagsCounter = document.querySelector('#flags');
     this.timerCounter = document.querySelector('#timer');
-    this.difficultySelect = document.querySelector('#difficulty');
+    this.gameFrame = document.querySelector('.game-frame');
+    this.gameHero = document.querySelector('.game-hero');
+    this.newGameButton = document.querySelector('#new-game');
+    this.customHeight = document.querySelector('#custom-height');
+    this.customWidth = document.querySelector('#custom-width');
+    this.customMines = document.querySelector('#custom-mines');
+    this.nightMode = document.querySelector('#night-mode');
 
     this.installListeners();
     this.newGame();
     window.setInterval(() => this.updateTimer(), 1000);
   }
 
-  /** Installs face, difficulty, board-action, and drag-prevention listeners. */
+  /** Installs game, display, board-action, and drag-prevention listeners. */
   installListeners() {
     this.faceButton.addEventListener('click', () => this.newGame());
-    this.difficultySelect.addEventListener('change', () => {
-      const level = Program.levels[this.difficultySelect.value];
-      this.minefieldWidth = level.width;
-      this.minefieldHeight = level.height;
-      this.mines = level.mines;
-      this.newGame();
-    });
+    this.newGameButton.addEventListener('click', () => this.startSelectedGame());
+    document.querySelectorAll('[name="game-mode"]').forEach(input => input.addEventListener('change', () => this.selectGameMode(input.value)));
+    [this.customHeight, this.customWidth, this.customMines].forEach(input => input.addEventListener('input', () => document.querySelector('[value="Custom"]').checked = true));
+    document.querySelectorAll('[name="zoom"]').forEach(input => input.addEventListener('change', () => this.gameFrame.style.zoom = input.value / 100));
+    document.querySelectorAll('[name="position"]').forEach(input => input.addEventListener('change', () => this.gameHero.dataset.position = input.value));
+    this.nightMode.addEventListener('change', () => document.body.classList.toggle('night-mode-active', this.nightMode.checked));
 
     this.boardElement.addEventListener('mousedown', event => {
       const button = event.target.closest('.cell');
       if (!button) return;
 
       const tile = this.tileFor(button);
-      if (event.buttons === 3) {
+      if (event.buttons === 3 || event.button === 1) {
+        this.pressedCell = null;
         event.preventDefault();
         tile.chord();
         this.render();
-      } else if (event.button === 0) {
-        tile.pressPrimary();
+      } else if (event.button === 2 || event.ctrlKey && event.button === 0) {
+        event.preventDefault();
+        tile.pressSecondary();
         this.render();
+      } else if (event.button === 0) {
+        this.pressedCell = button;
+        this.setFace('shocked');
+        this.faceImage.src = `src/res/${this.face}.png`;
       }
     });
 
-    this.boardElement.addEventListener('mouseup', event => {
-      if (event.button === 0 && !this.game.getIsGameOver()) this.setFace('smiley');
-      this.render();
-    });
+    document.addEventListener('mouseup', event => this.releasePrimary(event));
 
-    this.boardElement.addEventListener('contextmenu', event => {
-      event.preventDefault();
-      const button = event.target.closest('.cell');
-      if (!button) return;
-
-      this.tileFor(button).pressSecondary();
-      this.render();
-    });
+    this.boardElement.addEventListener('contextmenu', event => event.preventDefault());
 
     this.boardElement.addEventListener('dragstart', event => event.preventDefault());
+    this.boardElement.addEventListener('mouseover', event => this.hoveredCell = event.target.closest('.cell'));
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        this.newGame();
+      } else if (event.code === 'Space' && this.hoveredCell && !event.target.closest('.control-panel')) {
+        event.preventDefault();
+        const tile = this.tileFor(this.hoveredCell);
+        tile.isRevealed ? tile.chord() : tile.pressSecondary();
+        this.render();
+      }
+    });
+  }
+
+  /** Reveals tile under pointer when primary button is released over board. */
+  releasePrimary(event) {
+    if (event.button !== 0 || !this.pressedCell) return;
+
+    this.pressedCell = null;
+    const button = event.target.closest('.cell');
+    if (button && !this.game.getIsGameOver()) this.tileFor(button).pressPrimary();
+    if (!this.game.getIsGameOver()) this.setFace('smiley');
+    this.render();
+  }
+
+  /** Applies selected preset or validated custom dimensions, then starts a game. */
+  startSelectedGame() {
+    const selected = document.querySelector('[name="game-mode"]:checked').value;
+    const level = Program.levels[selected];
+
+    if (level) {
+      this.minefieldWidth = level.width;
+      this.minefieldHeight = level.height;
+      this.mines = level.mines;
+    } else {
+      this.minefieldHeight = Math.min(99, Math.max(4, Math.floor(Number(this.customHeight.value)) || 4));
+      this.minefieldWidth = Math.min(99, Math.max(4, Math.floor(Number(this.customWidth.value)) || 4));
+      const maxMines = this.minefieldHeight * this.minefieldWidth - 9;
+      this.mines = Math.min(maxMines, Math.max(1, Math.floor(Number(this.customMines.value)) || 1));
+      this.customHeight.value = this.minefieldHeight;
+      this.customWidth.value = this.minefieldWidth;
+      this.customMines.value = this.mines;
+      this.customMines.max = maxMines;
+    }
+    this.newGame();
+  }
+
+  /** Starts selected preset immediately; custom dimensions wait for New Game. */
+  selectGameMode(mode) {
+    if (mode === 'Custom') return;
+    const level = Program.levels[mode];
+    this.minefieldHeight = level.height;
+    this.minefieldWidth = level.width;
+    this.mines = level.mines;
+    this.newGame();
   }
 
   /** Resets timer, face, board, and counters using selected difficulty. */

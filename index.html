@@ -15,7 +15,7 @@
       </nav>
     </header>
     <main class="site-content">
-      <section class="game-hero">
+      <section class="game-hero" data-position="center">
         <section class="game-frame" aria-label="MySweeper">
           <header class="controls">
             <output id="flags" class="counter" aria-label="Flags remaining">000</output>
@@ -24,10 +24,54 @@
           </header>
           <section class="board" aria-label="Minesweeper board"></section>
         </section>
-        <label class="difficulty">Difficulty
-          <select id="difficulty"><option>Beginner</option><option>Intermediate</option><option selected>Expert</option></select>
-        </label>
-        <p class="instructions">Left-click: reveal · Right-click: flag · Both buttons on number: chord</p>
+        <section class="game-panels" aria-label="Game settings">
+          <details class="control-panel">
+            <summary>Game Settings</summary>
+            <div class="panel-content">
+              <div class="game-settings">
+                <div class="game-setting-heading"><span></span><span>Height</span><span>Width</span><span>Mines</span></div>
+                <label class="game-setting"><span><input type="radio" name="game-mode" value="Beginner"> Beginner</span><span>9</span><span>9</span><span>10</span></label>
+                <label class="game-setting"><span><input type="radio" name="game-mode" value="Intermediate"> Intermediate</span><span>16</span><span>16</span><span>40</span></label>
+                <label class="game-setting"><span><input type="radio" name="game-mode" value="Expert" checked> Expert</span><span>16</span><span>30</span><span>99</span></label>
+                <label class="game-setting"><span><input type="radio" name="game-mode" value="Custom"> Custom</span><input id="custom-height" type="number" min="4" max="99" value="20" aria-label="Custom height"><input id="custom-width" type="number" min="4" max="99" value="30" aria-label="Custom width"><input id="custom-mines" type="number" min="1" value="145" aria-label="Custom mines"></label>
+              </div>
+              <button id="new-game" type="button">New Game</button>
+            </div>
+          </details>
+
+          <details class="control-panel">
+            <summary>Display</summary>
+            <div class="panel-content">
+              <fieldset class="display-setting">
+                <legend>Zoom</legend>
+                <label><input type="radio" name="zoom" value="50"> 50%</label>
+                <label><input type="radio" name="zoom" value="75"> 75%</label>
+                <label><input type="radio" name="zoom" value="100" checked> 100%</label>
+                <label><input type="radio" name="zoom" value="125"> 125%</label>
+                <label><input type="radio" name="zoom" value="150"> 150%</label>
+              </fieldset>
+              <fieldset class="display-setting">
+                <legend>Position</legend>
+                <label><input type="radio" name="position" value="center" checked> Center</label>
+                <label><input type="radio" name="position" value="left"> Left</label>
+              </fieldset>
+              <label class="night-mode"><input id="night-mode" type="checkbox"> Night Mode</label>
+            </div>
+          </details>
+
+          <details class="control-panel controls-panel">
+            <summary>Controls</summary>
+            <div class="panel-content">
+              <ul>
+                <li>Left-click a tile to reveal it.</li>
+                <li>Right-click a tile to flag it.</li>
+                <li>Left + right click a number to reveal adjacent squares (chording).</li>
+                <li>Space bar on a tile to flag it or reveal its adjacent squares.</li>
+                <li>Press ESC or click the smiley face to start a new game.</li>
+              </ul>
+            </div>
+          </details>
+        </section>
       </section>
     </main>
     <footer>
