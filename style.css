@@ -62,11 +62,12 @@ body {
 
 .site-content { flex: 1; }
 .game-hero {
+  --title-gap: 1.5rem;
   display: grid;
   justify-items: center;
-  gap: 1.5rem;
-  padding: clamp(3rem, 7vw, 6rem) 2rem;
-  background: linear-gradient(135deg, var(--navy-950), var(--navy-900));
+  gap: var(--title-gap);
+  padding: var(--title-gap) 2rem clamp(3rem, 7vw, 6rem);
+  background: var(--surface-muted);
 }
 .game-hero[data-position="left"] { justify-items: start; }
 .eyebrow {
@@ -140,6 +141,8 @@ h1 {
   color: var(--ink);
   font-size: .9rem;
 }
+.game-title { order: -2; width: min(100%, 60rem); margin: 0; text-align: left; }
+.game-title h1 { font-size: clamp(1.75rem, 3vw, 2.5rem); }
 .control-panel { position: relative; overflow: visible; border: 1px solid var(--border); border-radius: 8px; background: rgba(7, 28, 53, .72); }
 .control-panel summary { display: flex; align-items: center; justify-content: space-between; padding: .8rem 1rem; color: white; cursor: pointer; font-weight: 800; list-style: none; }
 .control-panel summary::-webkit-details-marker { display: none; }
@@ -177,7 +180,7 @@ footer p { margin: 0; }
 @media (max-width: 575.98px) {
   :root { --site-brand-offset: 1.25rem; }
   .site-nav { align-items: flex-start; flex-direction: column; gap: .5rem; padding-block: 1rem; }
-  .game-hero { padding: 3rem 1.25rem; }
+  .game-hero { padding: var(--title-gap) 1.25rem 3rem; }
   .site-links a { padding: .5rem .55rem; font-size: .72rem; }
   .game-panels { grid-template-columns: 1fr; }
 }
