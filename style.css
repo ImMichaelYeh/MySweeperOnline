@@ -18,6 +18,7 @@
 
 body {
   display: flex;
+  align-items: stretch;
   min-width: 320px;
   min-height: 100vh;
   flex-direction: column;
@@ -30,6 +31,8 @@ body {
 }
 
 .site-header {
+  align-self: stretch;
+  width: 100%;
   background: var(--navy-950);
 }
 
@@ -454,6 +457,8 @@ h1 {
 }
 
 footer {
+  align-self: stretch;
+  width: 100%;
   margin-top: auto;
   padding: 1rem 2rem;
   color: rgba(255, 255, 255, .62);

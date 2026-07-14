@@ -30,6 +30,7 @@ class Program {
     this.leaderboard = this.loadLeaderboard();
     this.currentDifficulty = 'Expert';
 
+    this.setMobileDefaults();
     this.restoreSettings();
     this.applySelectedSettings();
     this.updateZoom();
@@ -187,6 +188,13 @@ class Program {
       if (Number.isInteger(zoom) && zoom >= 50 && zoom <= 150 && zoom % 10 === 0) this.zoom.value = zoom;
       if (['left', 'center', 'right'].includes(settings.position)) document.querySelector(`[name="position"][value="${settings.position}"]`).checked = true;
     } catch { /* No valid saved settings. */ }
+  }
+
+  /** Uses a smaller, left-aligned board as the default on mobile screens. */
+  setMobileDefaults() {
+    if (!window.matchMedia('(max-width: 575.98px)').matches) return;
+    this.zoom.value = 70;
+    document.querySelector('[name="position"][value="left"]').checked = true;
   }
 
   /** Resets timer, face, board, and counters using selected difficulty. */
