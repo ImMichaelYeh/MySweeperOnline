@@ -7,7 +7,7 @@ const context = { globalThis: {} };
 vm.runInNewContext(fs.readFileSync('src/Tile.js', 'utf8'), context);
 const Tile = context.globalThis.Tile;
 
-test('chording with a wrong flag loses even when a safe neighbor would complete the board first', () => {
+test('chording with a wrong flag reveals only the mine', () => {
   const game = {
     isGameOver: false,
     safeCellsRemaining: 1,
@@ -30,6 +30,7 @@ test('chording with a wrong flag loses even when a safe neighbor would complete 
 
   center.chord();
 
-  assert.equal(safe.isRevealed, true);
+  assert.equal(safe.isRevealed, false);
+  assert.equal(mine.isRevealed, true);
   assert.equal(game.win, false);
 });

@@ -83,13 +83,16 @@ class Tile {
     if (flags !== this.numberMinesSurrounding) return;
 
     const hiddenNeighbors = surroundingTiles.filter(tile => tile && !tile.isFlagged && !tile.isRevealed);
-    const safeNeighbors = hiddenNeighbors.filter(tile => !tile.isMine);
     const exposedMine = hiddenNeighbors.find(tile => tile.isMine);
-    for (const tile of safeNeighbors) tile.click(true);
 
     if (exposedMine) {
       exposedMine.click();
-    } else if (this.gameInstance.getNumberSafeCellsRemaining() <= 0) {
+      return;
+    }
+
+    for (const tile of hiddenNeighbors) tile.click(true);
+
+    if (this.gameInstance.getNumberSafeCellsRemaining() <= 0) {
       this.gameInstance.gameOver(true);
     }
   }
