@@ -12,6 +12,12 @@
   --site-brand-offset: max(2rem, calc((100vw - var(--content-width)) / 2 + 2rem));
 }
 
+@font-face {
+  font-family: "Press Start 2P";
+  src: url("src/res/press-start-2p.woff2") format("woff2");
+  font-display: block;
+}
+
 * {
   box-sizing: border-box;
 }
