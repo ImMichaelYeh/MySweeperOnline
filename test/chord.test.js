@@ -17,10 +17,11 @@ test('chording with a wrong flag reveals only the mine', () => {
     subtractSafeCell() { this.safeCellsRemaining--; },
     gameOver(win) { this.isGameOver = true; this.win = win; },
   };
-  const center = new Tile({}, game, 1, 1);
-  const safe = new Tile({}, game, 1, 2);
-  const mine = new Tile({}, game, 1, 3);
-  const wrongFlag = new Tile({}, game, 2, 1);
+  const program = { markTileForRender() {} };
+  const center = new Tile(program, game, 1, 1);
+  const safe = new Tile(program, game, 1, 2);
+  const mine = new Tile(program, game, 1, 3);
+  const wrongFlag = new Tile(program, game, 2, 1);
   center.isRevealed = true;
   center.numberMinesSurrounding = 1;
   safe.numberMinesSurrounding = 1;

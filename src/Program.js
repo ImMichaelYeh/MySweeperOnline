@@ -11,6 +11,7 @@ class Program {
     this.mines = 99;
     this.face = 'smiley';
     this.timerStartedAt = 0;
+    this.tilesToRender = null;
     this.game = null;
 
     this.boardElement = document.querySelector('.board');
@@ -202,6 +203,7 @@ class Program {
     this.timerStartedAt = 0;
     this.face = 'smiley';
     this.game = new Game(this, this.minefieldHeight, this.minefieldWidth, this.mines);
+    this.tilesToRender = null;
     this.render();
   }
 
@@ -221,11 +223,26 @@ class Program {
 
     if (this.boardElement.childElementCount !== tiles.length) {
       this.boardElement.replaceChildren(...tiles.map(tile => this.createTileButton(tile)));
+      this.tilesToRender = new Set();
       return;
     }
 
-    tiles.forEach((tile, index) => this.updateTileButton(this.boardElement.children[index], tile));
+    if (this.tilesToRender === null) {
+      tiles.forEach((tile, index) => this.updateTileButton(this.boardElement.children[index], tile));
+    } else {
+      for (const tile of this.tilesToRender) {
+        const index = (tile.row - 1) * this.minefieldWidth + tile.column - 1;
+        this.updateTileButton(this.boardElement.children[index], tile);
+      }
+    }
+    this.tilesToRender = new Set();
   }
+
+  /** Queues a changed tile for the next incremental render. */
+  markTileForRender(tile) { this.tilesToRender?.add(tile); }
+
+  /** Queues every tile when a game-ending state changes their appearance. */
+  markAllTilesForRender() { this.tilesToRender = null; }
 
   /**
    * Creates one HTML button from one Tile model.

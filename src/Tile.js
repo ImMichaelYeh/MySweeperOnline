@@ -27,6 +27,7 @@ class Tile {
     if (this.gameInstance.getIsGameOver() || this.isRevealed || this.isFlagged) return;
 
     this.isRevealed = true;
+    this.programInstance.markTileForRender(this);
 
     if (this.isMine) {
       this.gameInstance.gameOver(false);
@@ -66,9 +67,11 @@ class Tile {
     if (this.isFlagged) {
       this.isFlagged = false;
       this.gameInstance.addFlag();
+      this.programInstance.markTileForRender(this);
     } else if (this.gameInstance.getNumberFlagsRemaining() > 0) {
       this.isFlagged = true;
       this.gameInstance.subtractFlag();
+      this.programInstance.markTileForRender(this);
     }
   }
 
