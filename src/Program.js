@@ -277,7 +277,7 @@ class Program {
       image.src = `src/res/${imageName}.png`;
       return image;
     });
-    this.imagePreload = Promise.all(this.preloadedImages.map(image => image.decode?.().catch(() => undefined)));
+    this.preloadedImages.forEach(image => image.decode?.().catch(() => undefined));
   }
 
   /**
