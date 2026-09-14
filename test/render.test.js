@@ -7,6 +7,8 @@ test('renderer updates only changed tile buttons after the board is built', () =
   assert.match(source, /updateTileButton\(button, tile\)/);
   assert.match(source, /for \(const tile of this\.tilesToRender\)/);
   assert.match(source, /childElementCount !== tiles\.length/);
+  assert.match(source, /preloadImages\(\)/);
+  assert.doesNotMatch(source, /button\.querySelector\('img'\)/);
   assert.doesNotMatch(source, /replaceChildren\(\.\.\.buttons\)/);
 });
 

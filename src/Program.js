@@ -31,6 +31,7 @@ class Program {
     this.leaderboard = this.loadLeaderboard();
     this.currentDifficulty = 'Expert';
 
+    this.preloadImages();
     this.setMobileDefaults();
     this.restoreSettings();
     this.applySelectedSettings();
@@ -265,17 +266,18 @@ class Program {
     const renderKey = `${state}:${imageName || ''}`;
     if (button.dataset.renderKey === renderKey) return;
 
-    button.className = `cell ${state}`;
+    button.className = `cell ${state}${imageName ? ` ${imageName}` : ''}`;
     button.dataset.renderKey = renderKey;
-    if (imageName) {
-      const image = button.querySelector('img') || document.createElement('img');
+  }
+
+  /** Decodes tile artwork before a reveal needs to paint it. */
+  preloadImages() {
+    this.preloadedImages = Program.imageNames.map(imageName => {
+      const image = new Image();
       image.src = `src/res/${imageName}.png`;
-      image.alt = '';
-      image.draggable = false;
-      if (!image.parentElement) button.append(image);
-    } else {
-      button.replaceChildren();
-    }
+      return image;
+    });
+    this.imagePreload = Promise.all(this.preloadedImages.map(image => image.decode?.().catch(() => undefined)));
   }
 
   /**
@@ -385,6 +387,7 @@ class Program {
   static leaderboardKey = 'mysweeper-leaderboard';
   static settingsKey = 'mysweeper-settings';
   static numberImages = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight'];
+  static imageNames = [...Program.numberImages, 'tile', 'borderedbackground', 'flag', 'badflag', 'mine', 'mineclicked', 'smiley', 'shocked', 'dead', 'sunglasses'];
 }
 
 window.addEventListener('DOMContentLoaded', () => new Program());

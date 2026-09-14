@@ -164,37 +164,43 @@ h1 {
   cursor: pointer;
 }
 
+.cell.flagged {
+  background: url('src/res/flag.png') center / 75% 75% no-repeat, url('src/res/tile.png') center / 100% 100%;
+}
+
+.cell.badflag {
+  background: url('src/res/badflag.png') center / 75% 75% no-repeat, url('src/res/tile.png') center / 100% 100%;
+}
+
 .cell:hover {
   filter: brightness(.96);
 }
 
 .cell.revealed,
-.cell.mine,
-.cell.exploded {
+.cell.mine {
   background: url('src/res/borderedbackground.png') center / 100% 100%;
 }
 
-.cell img {
-  display: block;
-  width: 75%;
-  height: 75%;
-  margin: auto;
-  object-fit: contain;
-  image-rendering: pixelated;
-}
+.cell.revealed.zero { background: url('src/res/zero.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.one { background: url('src/res/one.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.two { background: url('src/res/two.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.three { background: url('src/res/three.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.four { background: url('src/res/four.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.five { background: url('src/res/five.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.six { background: url('src/res/six.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.seven { background: url('src/res/seven.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
+.cell.revealed.eight { background: url('src/res/eight.png') center / 70% 70% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%; }
 
-.cell.revealed img {
-  width: 70%;
-  height: 70%;
+.cell.mine {
+  background: url('src/res/mine.png') center / 75% 75% no-repeat, url('src/res/borderedbackground.png') center / 100% 100%;
 }
 
 .cell.exploded {
-  background: #f00;
+  background: url('src/res/mineclicked.png') center / 75% 75% no-repeat #f00;
 }
 
 .board,
 .cell,
-.cell img,
 .face img {
   user-select: none;
   -webkit-user-drag: none;
