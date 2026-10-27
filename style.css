@@ -409,6 +409,7 @@ h1 {
 }
 
 #new-game {
+  display: block;
   margin: 0 .45rem .6rem;
   padding: .35rem .65rem;
   border: 0;
