@@ -391,7 +391,8 @@ class Program {
       link.searchParams.set('width', this.minefieldWidth);
       link.searchParams.set('mines', this.mines);
     }
-    return `MySweeper · ${this.currentDifficulty} · ${Number(this.timerText())}s\n${this.minefieldWidth}×${this.minefieldHeight} · ${this.mines} mines\n\n${rows.join('\n')}\n\n${link.href}`;
+    const time = Number(this.timerText());
+    return `MySweeper · ${this.currentDifficulty}\nTry to beat my time of ${time} ${time === 1 ? 'second' : 'seconds'} on a board with ${this.minefieldHeight} rows, ${this.minefieldWidth} columns, and ${this.mines} ${this.mines === 1 ? 'mine' : 'mines'}!\n\n${rows.join('\n')}\n\n${link.href}`;
   }
 
   /** Copies the saved win, with selectable text when clipboard access is unavailable. */

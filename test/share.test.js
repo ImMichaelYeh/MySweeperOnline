@@ -48,18 +48,25 @@ test('winning shows sharing and copies a frozen emoji board with time and dimens
 
   program.game.gameOver(true);
   assert.equal(program.shareResult.hidden, false);
-  assert.equal(program.resultText, 'MySweeper · Custom · 71s\n3×2 · 1 mines\n\n🚩1️⃣⬛\n2️⃣8️⃣⬛\n\nhttps://immichaelyeh.github.io/MySweeperOnline/?difficulty=Custom&height=2&width=3&mines=1');
+  assert.equal(program.resultText, 'MySweeper · Custom\nTry to beat my time of 71 seconds on a board with 2 rows, 3 columns, and 1 mine!\n\n🚩1️⃣⬛\n2️⃣8️⃣⬛\n\nhttps://immichaelyeh.github.io/MySweeperOnline/?difficulty=Custom&height=2&width=3&mines=1');
   assert.equal(program.leaderboard[0].time, 71);
   advanceTime();
   await program.copyResult();
   assert.equal(copied, program.resultText);
-  assert.match(copied, /71s/);
+  assert.match(copied, /71 seconds/);
   assert.match(program.copyStatus.textContent, /Copied!/);
 
   program.newGame();
   assert.equal(program.resultText, '');
   assert.equal(program.shareResult.hidden, true);
   assert.equal(program.copyStatus.textContent, '');
+});
+
+test('shared invitations handle singular seconds and multiple mines', () => {
+  const { program } = createProgram();
+  program.timerStartedAt = 99000;
+  program.mines = 2;
+  assert.match(program.createResultText(), /1 second on a board with 2 rows, 3 columns, and 2 mines!/);
 });
 
 test('losses do not offer sharing', () => {
