@@ -27,6 +27,12 @@ class Program {
     this.customMines = document.querySelector('#custom-mines');
     this.zoom = document.querySelector('#zoom');
     this.nightMode = document.querySelector('#night-mode');
+    this.bestTimeMode = document.querySelector('#best-time-mode');
+    this.bestTimeBadge = document.querySelector('#best-time-badge');
+    this.shareResult = document.querySelector('#share-result');
+    this.copyResultButton = document.querySelector('#copy-result');
+    this.copyStatus = document.querySelector('#copy-status');
+    this.shareText = document.querySelector('#share-text');
     this.leaderboardElements = Object.fromEntries(Program.leaderboardDifficulties.map(difficulty => [difficulty, document.querySelector(`#leaderboard-${difficulty.toLowerCase()}`)]));
     this.leaderboard = this.loadLeaderboard();
     this.currentDifficulty = 'Expert';
@@ -34,6 +40,7 @@ class Program {
     this.preloadImages();
     this.setMobileDefaults();
     this.restoreSettings();
+    this.restoreSharedSettings();
     this.applySelectedSettings();
     this.updateZoom();
     this.updatePosition();
@@ -47,6 +54,7 @@ class Program {
   installListeners() {
     this.faceButton.addEventListener('click', () => this.newGame());
     this.newGameButton.addEventListener('click', () => this.startSelectedGame());
+    this.copyResultButton.addEventListener('click', () => this.copyResult());
     document.querySelectorAll('[name="game-mode"]').forEach(input => input.addEventListener('change', () => this.saveSettings()));
     [this.customHeight, this.customWidth, this.customMines].forEach(input => input.addEventListener('input', () => {
       document.querySelector('[value="Custom"]').checked = true;
@@ -64,6 +72,11 @@ class Program {
       if (!event.target.closest('.control-panel')) document.querySelectorAll('.control-panel[open]').forEach(panel => panel.removeAttribute('open'));
     });
     this.nightMode.addEventListener('change', () => document.body.classList.toggle('night-mode-active', this.nightMode.checked));
+    this.bestTimeMode.addEventListener('change', () => {
+      this.saveSettings();
+      this.updateBestTimeBadge();
+      this.updateTimer();
+    });
     this.gameFrame.addEventListener('mousedown', event => {
       if (!event.target.closest('.cell, .face')) event.preventDefault();
     });
@@ -73,6 +86,7 @@ class Program {
       const button = event.target.closest('.cell');
       if (!button) return;
 
+      this.updateTimer();
       const tile = this.tileFor(button);
       if (event.buttons === 3 || event.button === 1) {
         this.pressedCell = null;
@@ -86,7 +100,7 @@ class Program {
         this.render();
       } else if (event.button === 0) {
         this.pressedCell = button;
-        this.setFace('shocked');
+        if (!this.game.getIsGameOver()) this.setFace('shocked');
         this.faceImage.src = `src/res/${this.face}.png`;
       }
     });
@@ -101,8 +115,9 @@ class Program {
       if (event.key === 'Escape') {
         event.preventDefault();
         this.newGame();
-      } else if (event.code === 'Space' && this.hoveredCell && !event.target.closest('.control-panel')) {
+      } else if (event.code === 'Space' && this.hoveredCell && !event.target.closest('.control-panel, .share-result')) {
         event.preventDefault();
+        this.updateTimer();
         const tile = this.tileFor(this.hoveredCell);
         tile.isRevealed ? tile.chord() : tile.pressSecondary();
         this.render();
@@ -115,6 +130,7 @@ class Program {
     if (event.button !== 0 || !this.pressedCell) return;
 
     this.pressedCell = null;
+    this.updateTimer();
     const button = event.target.closest('.cell');
     if (button && !this.game.getIsGameOver()) this.tileFor(button).pressPrimary();
     if (!this.game.getIsGameOver()) this.setFace('smiley');
@@ -151,6 +167,19 @@ class Program {
     }
   }
 
+  /** Lets a shared link override saved board settings using the usual validation. */
+  restoreSharedSettings() {
+    const params = new URLSearchParams(window.location.search);
+    const difficulty = params.get('difficulty');
+    if (!Program.difficulties.includes(difficulty)) return;
+    if (difficulty === 'Custom') {
+      const values = ['height', 'width', 'mines'].map(key => params.get(key));
+      if (!values.every(value => value !== null && value.trim() !== '' && Number.isSafeInteger(Number(value)))) return;
+      [this.customHeight, this.customWidth, this.customMines].forEach((input, index) => input.value = values[index]);
+    }
+    document.querySelector(`[name="game-mode"][value="${difficulty}"]`).checked = true;
+  }
+
   /** Applies zoom control and its displayed value. */
   updateZoom() {
     this.gameFrame.style.zoom = this.zoom.value / 100 * .9;
@@ -167,6 +196,7 @@ class Program {
     const gameMode = document.querySelector('[name="game-mode"]:checked').value;
     const settings = {
       gameMode,
+      bestTimeMode: this.bestTimeMode.checked,
       customHeight: this.customHeight.value,
       customWidth: this.customWidth.value,
       customMines: this.customMines.value,
@@ -181,6 +211,7 @@ class Program {
     try {
       const settings = JSON.parse(localStorage.getItem(Program.settingsKey));
       if (!settings || typeof settings !== 'object') return;
+      this.bestTimeMode.checked = settings.bestTimeMode === true;
       if (Program.levels[settings.gameMode] || settings.gameMode === 'Custom') document.querySelector(`[value="${settings.gameMode}"]`).checked = true;
       [this.customHeight, this.customWidth, this.customMines].forEach((input, index) => {
         const value = [settings.customHeight, settings.customWidth, settings.customMines][index];
@@ -201,7 +232,12 @@ class Program {
 
   /** Resets timer, face, board, and counters using selected difficulty. */
   newGame() {
+    this.resultText = '';
+    this.shareResult.hidden = true;
+    this.shareText.hidden = true;
+    this.copyStatus.textContent = '';
     this.timerStartedAt = 0;
+    this.timerStoppedAt = null;
     this.face = 'smiley';
     this.game = new Game(this, this.minefieldHeight, this.minefieldWidth, this.mines);
     this.tilesToRender = null;
@@ -210,6 +246,7 @@ class Program {
 
   /** Renders counters, face, and only tiles whose visual state changed. */
   render() {
+    this.updateBestTimeBadge();
     this.flagsCounter.textContent = this.game.getFlagsRemaining();
     this.timerCounter.textContent = this.timerText();
     this.faceImage.src = `src/res/${this.face}.png`;
@@ -317,10 +354,18 @@ class Program {
   }
 
   /** Starts elapsed-time measurement after first reveal. */
-  startTimer() { this.timerStartedAt = Date.now(); }
+  startTimer() {
+    this.timerStartedAt = Date.now();
+    this.updateTimer();
+  }
+
+  /** Freezes elapsed time for every render after a win or loss. */
+  stopTimer() { this.timerStoppedAt = Date.now(); }
 
   /** Saves a winning result and retains only ten fastest local times. */
   recordWin() {
+    this.resultText = this.createResultText();
+    this.shareResult.hidden = false;
     this.leaderboard.push({
       time: Number(this.timerText()),
       difficulty: this.currentDifficulty,
@@ -332,6 +377,38 @@ class Program {
       .slice(0, 10));
     try { localStorage.setItem(Program.leaderboardKey, JSON.stringify(this.leaderboard)); } catch { /* Storage unavailable. */ }
     this.renderLeaderboard();
+  }
+
+  /** Builds a pasteable snapshot of the winning board, excluding its padding. */
+  createResultText() {
+    const symbols = ['⬛', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣'];
+    const rows = this.game.getBoard().slice(1, -1).map(row => row.slice(1, -1)
+      .map(tile => tile.isMine ? '🚩' : symbols[tile.numberMinesSurrounding]).join(''));
+    const link = new URL('https://immichaelyeh.github.io/MySweeperOnline/');
+    link.searchParams.set('difficulty', this.currentDifficulty);
+    if (this.currentDifficulty === 'Custom') {
+      link.searchParams.set('height', this.minefieldHeight);
+      link.searchParams.set('width', this.minefieldWidth);
+      link.searchParams.set('mines', this.mines);
+    }
+    return `MySweeper · ${this.currentDifficulty} · ${Number(this.timerText())}s\n${this.minefieldWidth}×${this.minefieldHeight} · ${this.mines} mines\n\n${rows.join('\n')}\n\n${link.href}`;
+  }
+
+  /** Copies the saved win, with selectable text when clipboard access is unavailable. */
+  async copyResult() {
+    const text = this.resultText;
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      if (this.resultText === text) this.copyStatus.textContent = 'Copied! Paste your result anywhere.';
+    } catch {
+      if (this.resultText !== text) return;
+      this.copyStatus.textContent = 'Select and copy your result below.';
+      this.shareText.value = text;
+      this.shareText.hidden = false;
+      this.shareText.focus();
+      this.shareText.select();
+    }
   }
 
   /** Loads valid leaderboard entries saved in this browser. */
@@ -348,6 +425,7 @@ class Program {
 
   /** Renders saved local results with their board details and timestamp. */
   renderLeaderboard() {
+    this.updateBestTimeBadge();
     Program.leaderboardDifficulties.forEach(difficulty => {
       const entries = this.leaderboard.filter(entry => entry.difficulty === difficulty);
       this.leaderboardElements[difficulty].replaceChildren(...(entries.length ? entries : [{ time: null }]).map(entry => {
@@ -364,11 +442,33 @@ class Program {
     });
   }
 
-  /** Updates timer display while an active game is running. */
-  updateTimer() { if (this.game?.getIsGameStarted() && !this.game.getIsGameOver()) this.timerCounter.textContent = this.timerText(); }
+  /** @returns {number} Fastest saved time for the active difficulty, or Infinity. */
+  getBestTime() {
+    return Math.min(...this.leaderboard
+      .filter(entry => entry.difficulty === this.currentDifficulty)
+      .map(entry => entry.time));
+  }
+
+  /** Shows the active mode and the time to beat above the board. */
+  updateBestTimeBadge() {
+    this.bestTimeBadge.hidden = !this.bestTimeMode.checked;
+    const bestTime = this.getBestTime();
+    this.bestTimeBadge.textContent = `Best Time Mode · ${Number.isFinite(bestTime) ? `Beat ${bestTime}s` : 'No best yet'}`;
+  }
+
+  /** Updates the active timer and ends runs that can no longer beat the best time. */
+  updateTimer() {
+    if (!this.game?.getIsGameStarted() || this.game.getIsGameOver()) return;
+    this.timerCounter.textContent = this.timerText();
+    if (!this.bestTimeMode.checked) return;
+    if (Number(this.timerText()) >= this.getBestTime()) {
+      this.game.gameOver(false);
+      this.render();
+    }
+  }
 
   /** @returns {string} Three-digit elapsed time, capped at 999. */
-  timerText() { return String(this.timerStartedAt ? Math.min(999, Math.floor((Date.now() - this.timerStartedAt) / 1000)) : 0).padStart(3, '0'); }
+  timerText() { return String(this.timerStartedAt ? Math.min(999, Math.floor(((this.timerStoppedAt ?? Date.now()) - this.timerStartedAt) / 1000)) : 0).padStart(3, '0'); }
 
   /** @param {string} face Original face PNG basename to display. */
   setFace(face) { this.face = face; }

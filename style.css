@@ -92,6 +92,18 @@ h1 {
   line-height: 1.05;
 }
 
+.best-time-badge {
+  margin: 0;
+  padding: .35rem .75rem;
+  border: 1px solid var(--gold);
+  border-radius: 999px;
+  background: var(--navy-950);
+  color: var(--gold);
+  font-size: .9rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 .game-frame {
   display: grid;
   gap: 1rem;
@@ -204,6 +216,36 @@ h1 {
 .face img {
   user-select: none;
   -webkit-user-drag: none;
+}
+
+.share-result {
+  max-width: 100%;
+  text-align: center;
+}
+
+#copy-result {
+  padding: .6rem 1rem;
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  background: var(--navy-950);
+  color: var(--gold);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+#copy-status {
+  margin: .5rem 0 0;
+}
+
+#copy-status:empty {
+  display: none;
+}
+
+#share-text {
+  width: 100%;
+  margin-top: .5rem;
+  white-space: pre;
 }
 
 .game-panels {
@@ -454,7 +496,8 @@ h1 {
   margin-top: .4rem;
 }
 
-.night-mode {
+.night-mode,
+.best-time-mode {
   display: block;
   padding: .6rem;
   font-weight: 700;

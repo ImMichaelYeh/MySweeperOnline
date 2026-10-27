@@ -77,6 +77,7 @@ class Game {
    */
   gameOver(win) {
     if (this.isGameOver) return;
+    this.programInstance.stopTimer();
     this.isGameOver = true;
     this.programInstance.markAllTilesForRender();
     this.programInstance.setFace(win ? 'sunglasses' : 'dead');

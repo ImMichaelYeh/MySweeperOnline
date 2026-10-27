@@ -28,6 +28,7 @@
   </header>
   <main class="site-content">
     <section class="game-hero" data-position="center">
+      <p id="best-time-badge" class="best-time-badge" role="status" hidden></p>
       <section class="game-frame" aria-label="MySweeper">
         <header class="controls">
           <output id="flags" class="counter" aria-label="Flags remaining">000</output>
@@ -36,6 +37,11 @@
           <output id="timer" class="counter" aria-label="Elapsed time">000</output>
         </header>
         <section class="board" aria-label="Minesweeper board"></section>
+      </section>
+      <section id="share-result" class="share-result" aria-label="Share winning board" hidden>
+        <button id="copy-result" type="button">Copy Result</button>
+        <p id="copy-status" role="status"></p>
+        <textarea id="share-text" aria-label="Result to copy" rows="8" readonly hidden></textarea>
       </section>
       <section id="leaderboard-panel" class="leaderboard-panel" aria-label="Leaderboard">
         <h2>Best Times</h2>
@@ -72,6 +78,8 @@
                   id="custom-width" type="number" min="4" max="99" value="30" aria-label="Custom width"><input
                   id="custom-mines" type="number" min="1" value="145" aria-label="Custom mines"></label>
             </div>
+            <label class="best-time-mode"><input id="best-time-mode" type="checkbox"
+                title="End the game when the timer reaches your best saved time for this difficulty. No limit until your first win."> Best Time Mode</label>
             <button id="new-game" type="button">New Game</button>
           </div>
         </details>
