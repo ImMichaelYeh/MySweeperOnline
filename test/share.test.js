@@ -48,7 +48,7 @@ test('winning shows sharing and copies a frozen emoji board with time and dimens
 
   program.game.gameOver(true);
   assert.equal(program.shareResult.hidden, false);
-  assert.equal(program.resultText, 'MySweeper · Custom\nTry to beat my time of 71 seconds on a board with 2 rows, 3 columns, and 1 mine!\n\n🚩1️⃣⬛\n2️⃣8️⃣⬛\n\nhttps://immichaelyeh.github.io/MySweeperOnline/?difficulty=Custom&height=2&width=3&mines=1');
+  assert.equal(program.resultText, 'MySweeper · Custom\nTry to beat my time of 71 seconds on a custom 2 x 3 board with 1 mine!\n\n🚩1️⃣⬛\n2️⃣8️⃣⬛\n\nhttps://immichaelyeh.github.io/MySweeperOnline/?difficulty=Custom&height=2&width=3&mines=1');
   assert.equal(program.leaderboard[0].time, 71);
   advanceTime();
   await program.copyResult();
@@ -66,7 +66,7 @@ test('shared invitations handle singular seconds and multiple mines', () => {
   const { program } = createProgram();
   program.timerStartedAt = 99000;
   program.mines = 2;
-  assert.match(program.createResultText(), /1 second on a board with 2 rows, 3 columns, and 2 mines!/);
+  assert.match(program.createResultText(), /1 second on a custom 2 x 3 board with 2 mines!/);
 });
 
 test('losses do not offer sharing', () => {
@@ -161,7 +161,10 @@ test('shared preset links open the same difficulty over saved settings', () => {
     const { program, context } = createProgram();
     Object.assign(program, { currentDifficulty: difficulty, minefieldWidth: width, minefieldHeight: height, mines });
     program.newGame();
-    const link = program.createResultText().split('\n').at(-1);
+    program.timerStartedAt = 29000;
+    const result = program.createResultText();
+    assert.equal(result.split('\n')[1], `Try to beat my time of 71 seconds on ${difficulty.toLowerCase()} mode!`);
+    const link = result.split('\n').at(-1);
     assert.equal(link, `https://immichaelyeh.github.io/MySweeperOnline/?difficulty=${difficulty}`);
     followSharedLink(program, context, link);
     assert.equal(program.currentDifficulty, difficulty);
